@@ -43,20 +43,21 @@ echo "{}" > symbol-cli.config.json
 
 NETWORK=TEST_NET
 SYMBOL_HOST=http://host.docker.internal:3000
-SYMBOL_PW=1234567890
+MASTER_PW=1234567890
 SYMBOL_USER=master
 
 ADDRESSES_FILE=$SCRIPT_DIR/../symbol-bootstrap/target/config/generated-addresses/addresses.yml
-MASTER_PRIV=$(cat $ADDRESSES_FILE | ./cmds/yq.sh r - 'mosaics.currency[0].privateKey' )
-echo -ne '\n' | $SCRIPT_DIR/symbol-cli.sh profile create -p $MASTER_PRIV -n $NETWORK -u $SYMBOL_HOST --profile $SYMBOL_USER -d
-echo "masterアカウントの生成が完了しました。"
+MASTER_PRIV=$(cat $ADDRESSES_FILE | ./cmds/yq.sh r - 'nemesisSigner.privateKey' )
+echo -ne '\n' | $SCRIPT_DIR/symbol-cli.sh profile import -p $MASTER_PW -P $MASTER_PRIV -n $NETWORK -u $SYMBOL_HOST --profile $SYMBOL_USER -d
+echo "masterアカウントの読込が完了しました。"
 
-MOSAIC_ID=$(echo -ne '\n' | $SCRIPT_DIR/../cmds/symbol-cli.sh transaction mosaic --profile $SYMBOL_USER --non-expiring --divisibility 0 --restrictable --supply-mutable --transferable --amount 10000000 --max-fee 0 -p $MASTER_PRIV | grep 'Mosaic Id:' | grep 'Inner tx. 1' | awk '{print $10}')
+MOSAIC_ID=$(echo -ne '\n' | $SCRIPT_DIR/../cmds/symbol-cli.sh transaction mosaic --profile $SYMBOL_USER --non-expiring --divisibility 0 --restrictable --supply-mutable --transferable --amount 10000000 --max-fee 0 -p $MASTER_PW | grep 'Mosaic Id:' | grep 'Inner tx. 1' | awk '{print $10}')
 
 echo ""
 
 echo "MOSAICを発行しました. MOSAIC_ID: $MOSAIC_ID"
 
 cp /dev/null .env
+docker-compose -f docker-compose-init.yml up
 
 echo "MOSAIC=$MOSAIC_ID" >> .env
