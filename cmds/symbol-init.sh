@@ -53,11 +53,10 @@ echo "masterアカウントの読込が完了しました。"
 
 MOSAIC_ID=$(echo -ne '\n' | $SCRIPT_DIR/../cmds/symbol-cli.sh transaction mosaic --profile $SYMBOL_USER --non-expiring --divisibility 0 --restrictable --supply-mutable --transferable --amount 10000000 --max-fee 0 -p $MASTER_PW | grep 'Mosaic Id:' | grep 'Inner tx. 1' | awk '{print $10}')
 
-echo ""
+echo "masterを有効化しました。"
 
 echo "MOSAICを発行しました. MOSAIC_ID: $MOSAIC_ID"
 
 cp /dev/null .env
-docker-compose -f docker-compose-init.yml up
 
 echo "MOSAIC=$MOSAIC_ID" >> .env
