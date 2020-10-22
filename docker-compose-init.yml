@@ -1,0 +1,11 @@
+version: '3.7'
+services:
+  set_nem_envs:
+    build: ./build/set_nem_envs
+    command: node set_nem_envs
+    working_dir: /init
+    volumes:
+      - ./.env:/.env
+      - ./.env.sample:/.env.sample
+      - ./symbol-bootstrap/target/config/generated-addresses/addresses.yml:/addresses.yml
+      - ./build/set_nem_envs/:/init
